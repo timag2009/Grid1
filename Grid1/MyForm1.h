@@ -77,7 +77,7 @@ namespace Grid1 {
 			this->dataGridView1->ColumnHeadersHeightSizeMode = System::Windows::Forms::DataGridViewColumnHeadersHeightSizeMode::AutoSize;
 			this->dataGridView1->Location = System::Drawing::Point(22, 80);
 			this->dataGridView1->Name = L"dataGridView1";
-			this->dataGridView1->Size = System::Drawing::Size(249, 150);
+			this->dataGridView1->Size = System::Drawing::Size(265, 150);
 			this->dataGridView1->TabIndex = 0;
 			// 
 			// button1
@@ -125,7 +125,7 @@ namespace Grid1 {
 			this->label2->AutoSize = true;
 			this->label2->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 12, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(204)));
-			this->label2->Location = System::Drawing::Point(28, 56);
+			this->label2->Location = System::Drawing::Point(20, 56);
 			this->label2->Name = L"label2";
 			this->label2->Size = System::Drawing::Size(55, 20);
 			this->label2->TabIndex = 5;
@@ -135,9 +135,9 @@ namespace Grid1 {
 			// 
 			this->textBox1->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 12, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(204)));
-			this->textBox1->Location = System::Drawing::Point(89, 50);
+			this->textBox1->Location = System::Drawing::Point(106, 50);
 			this->textBox1->Name = L"textBox1";
-			this->textBox1->Size = System::Drawing::Size(133, 26);
+			this->textBox1->Size = System::Drawing::Size(116, 26);
 			this->textBox1->TabIndex = 6;
 			// 
 			// button3
@@ -190,13 +190,14 @@ namespace Grid1 {
 			dataGridView1->DataMember = "Название таблицы";
 			dataGridView1->DataSource = Set;
 		}
+
 	}
 	// Сохранили
 	private: System::Void button1_Click(System::Object^ sender, System::EventArgs^ e) {
 		Table->TableName = "Название таблицы";
 		Set->WriteXml(BaseName);
 	}
-	// Закрыли фору базы
+	// Закрыли форму базы
 	private: System::Void button2_Click(System::Object^ sender, System::EventArgs^ e) {
 		MyForm1::Close();
 	}
@@ -204,51 +205,74 @@ namespace Grid1 {
 	//   ПОИСК
 	private: System::Void button3_Click(System::Object^ sender, System::EventArgs^ e) {
 
-	for (int i = 0; i < dataGridView1->RowCount; i++) // по строкам
+		dataGridView1->Sort(dataGridView1->Columns[0], ListSortDirection::Ascending);  // Отссортируем по имени
+		bool isfind = false;
+		for (int i = 0; i < dataGridView1->RowCount; i++) // по строкам
 		{
-			for (int j = 0; j < this->dataGridView1->ColumnCount; ++j) // по колонкам
-			{
-			}
-			if (dataGridView1->Rows[i]->Cells[0]->Value != nullptr) {
 
+			for (int j = 0; j < this->dataGridView1->ColumnCount; ++j) // по колонкам если нужно посмотреть по колонкам
+			{
+				if (dataGridView1->Rows[i]->Cells[j]->Value != nullptr && dataGridView1->Rows[i]->Cells[j]->Value->ToString()->Contains(textBox1->Text) && textBox1->Text != "") {
+					dataGridView1->CurrentCell = dataGridView1->Rows[i]->Cells[j];  // Установим указатель в найденную строку
+					dataGridView1->Rows[i]->Selected = true;						// Выделим найденную строку
+					label2->Text = "В Номере";
+					label1->Text = "Имя " + dataGridView1->Rows[i]->Cells[0]->Value->ToString() + " тел: " + dataGridView1->Rows[i]->Cells[1]->Value->ToString();
+					isfind = true;
+					break;
+				}
 			}
-			if (dataGridView1->Rows[i]->Cells[0]->Value != nullptr && dataGridView1->Rows[i]->Cells[0]->Value->ToString()->Equals(textBox1->Text)) {
-				label2->Text = "";
-				label1->Text = "Нашли - " + dataGridView1->Rows[i]->Cells[0]->Value->ToString() + "  " + dataGridView1->Rows[i]->Cells[1]->Value->ToString();
+
+			if (dataGridView1->Rows[i]->Cells[0]->Value != nullptr && dataGridView1->Rows[i]->Cells[0]->Value->ToString()->Contains(textBox1->Text) && textBox1->Text != "") {
+				dataGridView1->CurrentCell = dataGridView1->Rows[i]->Cells[0];  // Установим указатель в найденную строку
+				dataGridView1->Rows[i]->Selected = true;						// Выделим найденную строку
+				label2->Text = "В Имени";
+				label1->Text = "Имя " + dataGridView1->Rows[i]->Cells[0]->Value->ToString() + " тел: " + dataGridView1->Rows[i]->Cells[1]->Value->ToString();
 				break;
 			}
 			else {
-				label1->Text = "Ничего не нашли ";
+				if (isfind == 0) {
+					label1->Text = "Ничего не нашли ";
+					// Установим указатель в 1 строку
+					dataGridView1->CurrentCell = dataGridView1->Rows[0]->Cells[0];
+
+				}
+
 			}
 		}
+	
 	} 
 	//   ПОИСК
 
 	};
 }
 
-	/*	for (int i = 0; i < dataGridView1.RowCount; i++)
 
-		if (textBox1.Text == dataGridView1.Rows.Cells[0].Value.ToString())
-		{
-			dataGridView1.CurrentCell = dataGridView1.Rows.Cells[0];
-			dataGridView1.FirstDisplayedScrollingRowIndex = i;
-			flag = true;
-			break;
-		}
-	if (!flag)
-		MessageBox.Show("НЕТУ");
+/*
+dataGridView1->ColumnCount \\Кол-во столбцов;
+dataGridView1->RowCount \\Кол-во строк;
 
-}
+dataGridView1->Rows[i]->Cells[j]->Value \\Обращение к элементу;
 
+System::Convert::ToString(dataGridView1->Rows[i]->Cells[j]->Value);
+System::Convert::ToDouble(dataGridView1->Rows[i]->Cells[j]->Value);
+System::Convert::ToInt16(dataGridView1->Rows[i]->Cells[j]->Value);
+System::Convert::ToInt32(dataGridView1->Rows[i]->Cells[j]->Value);
+System::Convert::ToInt64(dataGridView1->Rows[i]->Cells[j]->Value); \\Конвертация из Value в осн. типы;
+*/
 
-		int i = 0;
-		while (i<dataGridView1->RowCount && dataGridView1->Rows[i]->Cells[0]->Value != nullptr) {
-			if (dataGridView1->Rows[i]->Cells[0]->Value->ToString()->Equals(textBox1->Text)) {
-				label2->Text = "";
-				label1->Text = "Нашли - " + dataGridView1->Rows[i]->Cells[0]->Value->ToString() + "  " + dataGridView1->Rows[i]->Cells[1]->Value->ToString();
-				break;
-			}
-		i++;
-		}
+	/*	private void button1_Click(object sender, EventArgs e)
+        {
+ 
+            for (int i = 0; i < dataGridView1.RowCount; i++)
+            {
+                dataGridView1.Rows[i].Selected = false;
+                for (int j = 0; j < dataGridView1.ColumnCount; j++)
+                    if (dataGridView1.Rows[i].Cells[j].Value != null)
+                        if (dataGridView1.Rows[i].Cells[j].Value.ToString().Contains(textBox1.Text))
+                        {
+                            dataGridView1.Rows[i].Selected = true;
+                            break;
+                        }
+            }
+        }
 */
